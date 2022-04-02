@@ -2,14 +2,15 @@ unit calculation;
 
 interface
 uses
+    System.SysUtils, System.Math,
     Parser;
 
 function calculate(var treeNode:pExpression):Real;
 
 implementation
 
-function calculate(var treeNode:pExpression):Real;
-var
+function calculate(var treeNode:pExpression):Real;//add checking of calculation
+var                                               //and issue errors
     left, right:Real;
 Begin
     with treeNode^ do
@@ -23,6 +24,7 @@ Begin
                 lSub: value := left - right;
                 lMul: value := left * right;
                 lDiv: value := left / right;
+                lPow: value := Power(left, right);
             end;
         end;
         result := value;
