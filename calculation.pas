@@ -5,15 +5,15 @@ uses
     System.SysUtils, System.Math,
     Parser;
 
-function calculate(var treeNode:pExpression):Real;
+function calculate(var treeNode:TExpression):Real;
 
 implementation
 
-function calculate(var treeNode:pExpression):Real;//add checking of calculation
+function calculate(var treeNode:TExpression):Real;//add checking of calculation
 var                                               //and issue errors
     left, right:Real;
 Begin
-    with treeNode^ do
+    with treeNode do
     begin
         if(curLexem <> lNum) then
         begin

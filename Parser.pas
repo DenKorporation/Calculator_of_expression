@@ -4,15 +4,17 @@ interface
 type
     TLexem = (lAdd, lSub, lMul, lDiv, lPow, lLBrack, lRBrack, lNum); //left/right bracket
     pExpression = ^TExpression;
-    TExpression = record
+    TExpression = class
+    public
         value: Real;
         curLexem: TLexem;
-        pLeft: pExpression;
-        pRight: pExpression;
+        pLeft: TExpression;
+        pRight: TExpression;
+        constructor Create;
+        destructor Destroy;
     end;
 
-function ExpressionInit():String;
-function ParseExpression(sExpr:string; out isParsed:boolean):pExpression;
+function ParseExpression(sExpr:string; out isParsed:boolean):TExpression;
 
 implementation
 
@@ -23,13 +25,7 @@ uses
 //    AvailableOperation : array[lAdd..lRBrack] of string =
 //        ('+', '-', '*', '/', '^', '(', ')');
 
-
-function ExpressionInit():String;      //read Expression
-Begin                                  //in the Future, choice between form and file Input will be implemnted
-    readln(result);
-End;
-
-function ParseExpression(sExpr:string; out isParsed:boolean):pExpression;        //in future add posOfError:Integer as attribute
+function ParseExpression(sExpr:string; out isParsed:boolean):TExpression;        //in future add posOfError:Integer as attribute
 var
     Pos:integer;
     ExprSize:Integer;
@@ -47,6 +43,7 @@ function ParseNumber():Real;
 var
     size, cod:Integer;
 begin
+    result := 0;
     SkipWhiteSpaces;
     if(Pos > ExprSize) then
         isParsed := false
@@ -72,9 +69,8 @@ end;
 
 
 function ParseOperator():Tlexem;
-var
-    cod:Integer;
 begin
+    result := lNum;
     SkipWhiteSpaces;
     if(Pos > ExprSize) then
         isParsed := false
@@ -98,10 +94,10 @@ end;
 
 
 
-function ParseGroup():pExpression;forward;
+function ParseGroup():TExpression;forward;
 
 //atom->number|variable|group in future
-function ParseAtom():pExpression;  //atom is equal to atom
+function ParseAtom():TExpression;
 var
     tempPos:Integer;
 begin
@@ -110,11 +106,9 @@ begin
     if(result = nil) then
     begin
         Pos := tempPos;
-        New(Result);
-        with result^ do
+        Result := TExpression.Create;
+        with Result do
         begin
-            pLeft := nil;
-            pRight := nil;
             curLexem := lNum;
             value := parseNumber;
         end;
@@ -122,20 +116,20 @@ begin
 
     if not isParsed then
     begin
-        Dispose(result);
+        result.Free;
         result := nil
     end;
 end;
 
 
 //power->atom|atom^power
-function ParsePower():pExpression;
+function ParsePower():TExpression;
 var
     tempPos:Integer;
-    tempPtr:pExpression;
+    tempPtr:TExpression;
 begin
-    New(result);
-    with result^ do
+    Result := TExpression.Create;
+    with result do
     begin
         pLeft := parseAtom;
         if(pLeft <> nil) then
@@ -147,20 +141,20 @@ begin
                 pRight := ParsePower;
                 if not isParsed then
                 begin
-                    Dispose(result);
+                    result.free;
                     result := nil
                 end;
             end else
             begin
                 Pos := tempPos;
                 tempPtr := pLeft;
-                Dispose(result);
+                result.free;
                 result := tempPtr;
                 isParsed := true;
             end;
         end else
         begin
-            Dispose(result);
+            result.free;
             result := nil
         end;
     end;
@@ -169,15 +163,15 @@ end;
 
 //MulDiv->Power|power*mulDiv|power/MulDiv //some problem
 //MulDiv->Power(('*' Power)|('/' Power))*
-function ParseMulDiv():pExpression;
+function ParseMulDiv():TExpression;
 var
     tempPos:Integer;
-    tempPtr:pExpression;
+    tempPtr:TExpression;
     isEndOfParsing:boolean;
 begin
-    New(result);
+    Result := TExpression.Create;
     isEndOfParsing := false;
-    with result^ do
+    with result do
     begin
         pLeft := ParsePower;
         while (pLeft <> nil) and not isEndOfParsing do
@@ -188,30 +182,30 @@ begin
             begin    
                 pRight := parsePower;
                 if(pRight <> nil) then
-                begin        
-                    New(tempPtr);
-                    tempPtr^.pLeft := pLeft;
-                    tempPtr^.pRight := pRight;
-                    tempPtr^.curLexem := curLexem;
+                begin
+                    tempPtr := TExpression.Create;
+                    tempPtr.pLeft := pLeft;
+                    tempPtr.pRight := pRight;
+                    tempPtr.curLexem := curLexem;
                     pLeft := tempPtr;
                 end else
                 begin
-                    Dispose(result);
+                    result.free;
                     result := nil    
                 end;
             end else
             begin
                 Pos := tempPos;
                 tempPtr := pLeft;
-                Dispose(result);
+                result.free;
                 result := tempPtr;
                 isParsed := true;
                 isEndOfParsing := true;
             end;
         end;
-        if pLeft = nil then
+        if not isParsed then
         begin
-            Dispose(result);
+            result.free;
             result := nil    
         end;
     end;    
@@ -219,15 +213,15 @@ end;
 
 //AddSub->MulDiv|MulDiv+AddSub|MulDiv-AddSub //some problem (12 / 12 / 12) for example
 //AddSub->MulDiv(('+' MulDiv)|('-' MulDiv))*
-function ParseAddSub():pExpression;
+function ParseAddSub():TExpression;
 var
     tempPos:Integer;
-    tempPtr:pExpression;
+    tempPtr:TExpression;
     isEndOfParsing:boolean;
 begin
-    New(result);
+    Result := TExpression.Create;
     isEndOfParsing := false;
-    with result^ do
+    with result do
     begin
         pLeft := ParseMulDiv;
         while (pLeft <> nil) and not isEndOfParsing do
@@ -238,22 +232,22 @@ begin
             begin    
                 pRight := ParseMulDiv;
                 if(pRight <> nil) then
-                begin        
-                    New(tempPtr);
-                    tempPtr^.pLeft := pLeft;
-                    tempPtr^.pRight := pRight;
-                    tempPtr^.curLexem := curLexem;
+                begin
+                    tempPtr := TExpression.Create;
+                    tempPtr.pLeft := pLeft;
+                    tempPtr.pRight := pRight;
+                    tempPtr.curLexem := curLexem;
                     pLeft := tempPtr;
                 end else
                 begin
-                    Dispose(result);
-                    result := nil    
+                    result.free;
+                    result := nil
                 end;
             end else
             begin
                 Pos := tempPos;
                 tempPtr := pLeft;
-                Dispose(result);
+                result.free;
                 result := tempPtr;
                 isParsed := true;
                 isEndOfParsing := true;
@@ -261,7 +255,7 @@ begin
         end;
         if pLeft = nil then
         begin
-            Dispose(result);
+            result.free;
             result := nil    
         end;
     end;
@@ -269,10 +263,9 @@ end;
 
 
 //Group->'(' addsub ')'
-function ParseGroup():pExpression;
+function ParseGroup():TExpression;
 var
     tempPos:Integer;
-    tempPtr:pExpression;
     tempLexem:TLexem;
 begin
     tempPos := Pos;
@@ -308,6 +301,22 @@ begin
     ExprSize := High(sExpr);
 
         result := ParseAddSub;//change
+end;
+
+{ TExpression }
+
+constructor TExpression.Create;
+begin
+    value := 0;
+    curLexem := lNum;
+    pLeft := nil;
+    PRight := nil;
+end;
+
+destructor TExpression.Destroy;
+begin
+    pLeft.Free;
+    pRight.Free;
 end;
 
 end.

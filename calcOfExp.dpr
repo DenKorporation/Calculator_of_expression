@@ -3,36 +3,15 @@ program calcOfExp;
 {$R *.res}
 
 uses
-  System.SysUtils,
-  Parser,
-  Calculation;
-
-var
-  sExpr:String;
-  exprTree:pExpression; //head contain result of calculating the expression
-  isParsed:boolean;
+    Vcl.Forms,
+    System.SysUtils,
+    MainForm in 'MainForm.pas' {frmMain};
 
 begin
-    sExpr := ExpressionInit();
-    writeln(sExpr);
-    exprTree := parseExpression(sExpr, isParsed);
-
-    if isParsed then
-    begin
-        writeln(calculate(exprTree));
-    end else
-        writeln('Incorrect Expression');
-
-
-//    readln(sExpr);
-//
-//    var res := ParseNumber(sExpr, isParsed);
-//    if isParsed then
-//        writeln(res,'|', sExpr, '|')
-//    else
-//        writeln('|', sExpr, '|');
-
-    readln;
+    Application.Initialize;
+    Application.MainFormOnTaskbar := True;
+    Application.CreateForm(TfrmMain, frmMain);
+    Application.Run;
 end.
 
 
