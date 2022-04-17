@@ -1,5 +1,6 @@
 program calcOfExp;
-{$APPTYPE CONSOLE}
+{$APPTYPE GUI}
+//{$APPTYPE CONSOLE}
 {$R *.res}
 
 uses
