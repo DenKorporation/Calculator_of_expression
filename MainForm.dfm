@@ -15,6 +15,9 @@ object frmMain: TfrmMain
   OldCreateOrder = False
   Position = poScreenCenter
   Scaled = False
+  OnClose = CloseEvent
+  OnCloseQuery = mainCloseQuery
+  OnCreate = mainCreate
   PixelsPerInch = 96
   TextHeight = 13
   object PageCtrlMain: TPageControl
@@ -22,7 +25,7 @@ object frmMain: TfrmMain
     Top = 0
     Width = 784
     Height = 649
-    ActivePage = tabCalc
+    ActivePage = TabFileEnter
     Align = alClient
     Font.Charset = DEFAULT_CHARSET
     Font.Color = clWindowText
@@ -31,9 +34,86 @@ object frmMain: TfrmMain
     Font.Style = []
     MultiLine = True
     ParentFont = False
-    RaggedRight = True
     TabOrder = 0
-    TabWidth = 300
+    TabWidth = 200
+    object TabFileEnter: TTabSheet
+      Caption = 'File Input'
+      ImageIndex = 2
+      object lblState: TLabel
+        Left = 72
+        Top = 56
+        Width = 609
+        Height = 33
+        Alignment = taCenter
+        Caption = 'no file selected'
+        Font.Charset = DEFAULT_CHARSET
+        Font.Color = clWindowText
+        Font.Height = -20
+        Font.Name = 'Tahoma'
+        Font.Style = []
+        ParentFont = False
+      end
+      object btnChooseFile: TButton
+        Left = 72
+        Top = 145
+        Width = 129
+        Height = 65
+        Caption = 'Choose file'
+        Font.Charset = DEFAULT_CHARSET
+        Font.Color = clWindowText
+        Font.Height = -16
+        Font.Name = 'Tahoma'
+        Font.Style = []
+        ParentFont = False
+        TabOrder = 0
+        OnClick = btnChooseFileClick
+      end
+      object btnNextExpr: TButton
+        Left = 232
+        Top = 145
+        Width = 129
+        Height = 65
+        Caption = 'Read next'
+        Font.Charset = DEFAULT_CHARSET
+        Font.Color = clWindowText
+        Font.Height = -16
+        Font.Name = 'Tahoma'
+        Font.Style = []
+        ParentFont = False
+        TabOrder = 1
+        OnClick = btnNextExprClick
+      end
+      object btnToCalc: TButton
+        Left = 392
+        Top = 145
+        Width = 129
+        Height = 65
+        Caption = 'To calculator'
+        Font.Charset = DEFAULT_CHARSET
+        Font.Color = clWindowText
+        Font.Height = -16
+        Font.Name = 'Tahoma'
+        Font.Style = []
+        ParentFont = False
+        TabOrder = 2
+        OnClick = btnToCalcClick
+      end
+      object btnToGraph: TButton
+        Left = 552
+        Top = 145
+        Width = 129
+        Height = 65
+        Caption = 'To graph'
+        Font.Charset = DEFAULT_CHARSET
+        Font.Color = clWindowText
+        Font.Height = -16
+        Font.Name = 'Tahoma'
+        Font.Style = []
+        ParentFont = False
+        TabOrder = 3
+        OnClick = btnToGraphClick
+      end
+    end
     object tabCalc: TTabSheet
       Caption = 'Calculator'
       object lblAnswer: TLabel
@@ -58,18 +138,6 @@ object frmMain: TfrmMain
         Font.Charset = DEFAULT_CHARSET
         Font.Color = clWindowText
         Font.Height = -27
-        Font.Name = 'Tahoma'
-        Font.Style = []
-        ParentFont = False
-      end
-      object Label1: TLabel
-        Left = 288
-        Top = 312
-        Width = 6
-        Height = 24
-        Font.Charset = DEFAULT_CHARSET
-        Font.Color = clWindowText
-        Font.Height = -20
         Font.Name = 'Tahoma'
         Font.Style = []
         ParentFont = False
@@ -181,5 +249,10 @@ object frmMain: TfrmMain
         OnClick = btnDrawClick
       end
     end
+  end
+  object OpenTextFileDialog: TOpenTextFileDialog
+    Filter = 'txt file|*.txt'
+    Left = 748
+    Top = 35
   end
 end

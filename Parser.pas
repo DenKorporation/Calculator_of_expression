@@ -312,17 +312,27 @@ begin
     if(isParsed) and (tempLexem = lLBrack) then
     begin
         result := ParseAddSub;
-        if isParsed then
+        if Pos > ExprSize then
         begin
-            tempPos := Pos;
-            tempLexem := parseOperator;
-            if not isParsed or (tempLexem <> lRBrack) then
+            Pos := tempPos;
+            SkipWhiteSpaces;
+            isParsed := false;
+            Result.Destroy;
+            Result := nil;
+        end else
+        begin
+            if isParsed then
             begin
-                Pos := tempPos;
-                SkipWhiteSpaces;
-                isParsed := false;
-                Result.Destroy;
-                Result := nil;
+                tempPos := Pos;
+                tempLexem := parseOperator;
+                if not isParsed or (tempLexem <> lRBrack) then
+                begin
+                    Pos := tempPos;
+                    SkipWhiteSpaces;
+                    isParsed := false;
+                    Result.Destroy;
+                    Result := nil;
+                end;
             end;
         end;
     end else
@@ -368,7 +378,7 @@ begin
             tempLexem := lCos
         else if name = 'sin' then
             tempLexem := lSin
-        else if name = 'tan' then
+        else if name = 'tg' then
             tempLexem := lTan
         else if name = 'ctg' then
             tempLexem := lCtg

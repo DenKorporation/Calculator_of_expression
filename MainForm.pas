@@ -6,7 +6,7 @@ uses
   Winapi.Windows, Winapi.Messages, System.SysUtils, System.Variants, System.Classes, Vcl.Graphics,
   Vcl.Controls, Vcl.Forms, Vcl.Dialogs, Vcl.StdCtrls,
   Parser,
-  Calculation, Vcl.ComCtrls, Vcl.ExtCtrls;
+  Calculation, Vcl.ComCtrls, Vcl.ExtCtrls, Vcl.ExtDlgs;
 
 type
   TfrmMain = class(TForm)
@@ -23,9 +23,22 @@ type
     lblHeadGraph: TLabel;
     imgGraph: TImage;
     lblGraphAns: TLabel;
-    Label1: TLabel;
+    TabFileEnter: TTabSheet;
+    btnChooseFile: TButton;
+    btnNextExpr: TButton;
+    btnToCalc: TButton;
+    lblState: TLabel;
+    btnToGraph: TButton;
+    OpenTextFileDialog: TOpenTextFileDialog;
     procedure btnCalculateClick(Sender: TObject);
     procedure btnDrawClick(Sender: TObject);
+    procedure btnChooseFileClick(Sender: TObject);
+    procedure mainCloseQuery(Sender: TObject; var CanClose: Boolean);
+    procedure CloseEvent(Sender: TObject; var Action: TCloseAction);
+    procedure mainCreate(Sender: TObject);
+    procedure btnNextExprClick(Sender: TObject);
+    procedure btnToCalcClick(Sender: TObject);
+    procedure btnToGraphClick(Sender: TObject);
   private
     { Private declarations }
   public
@@ -34,42 +47,51 @@ type
 
 var
   frmMain: TfrmMain;
+  ExprFile: Text;
+  fileIsOpened, exprIsRead: boolean;
 
 implementation
 
 {$R *.dfm}
 
-Type TFunc = function (var treeNode:TExpression):Real;
-
-procedure DrawGraph (calc: TFunc; exprTree:TExpression; xLow: real; xHigh: real; canv: TCanvas);
+procedure DrawGraph (mCalc:TCalculator; xLow: real; xHigh: real; canv: TCanvas);
 var
     x, y, step: real;
     max, min: real;
     sclX, sclY: real;
     xmid, ymid: integer;
+    ErrorMessage: String;
+
 begin
     sclX := (canv.ClipRect.Right) / (xHigh - xLow);
     step := 1 / sclX;
     xMid := canv.ClipRect.Right div 2;
     yMid := canv.ClipRect.Bottom div 2;
-    x := xLow;
-    setX(x);
-    max := calc(exprTree);
+
+    mCalc.x := xLow;
+
+    max := 0;
     min := max;
-    while x <= xHigh do
+
+    while mCalc.x <= xHigh do
     begin
-        setX(x);
-        y := calc(exprTree);
-        if y < min then
-            min := y;
-        if y > max then
-            max := y;
-        x := x + step;
+        y := mCalc.calculate(ErrorMessage);
+        if length(ErrorMessage) = 0 then
+        begin
+            if y < min then
+                min := y;
+            if y > max then
+                max := y;
+        end;
+        mCalc.x := mCalc.x + step;
     end;
-    if max = min then
-        sclY := sclX
-    else
-        sclY := canv.ClipRect.Bottom / (max - min);
+
+    sclY := sclX;
+//    if max = min then
+//        sclY := sclX
+//    else
+//        sclY := canv.ClipRect.Bottom / (max - min);
+
     canv.Brush.Color := clBlack;
     canv.FillRect(Rect(0, 0, canv.ClipRect.Right, canv.ClipRect.Bottom));
     canv.Pen.Color := clYellow;
@@ -77,17 +99,23 @@ begin
     canv.LineTo(canv.ClipRect.Right, ymid);
     canv.MoveTo(xmid, 0);
     canv.LineTo(xmid, canv.ClipRect.Bottom);
-    x := xLow;
-    setX(x);
-    y := calc(exprTree);
+
+
     canv.Pen.Color := clWhite;
-    canv.MoveTo(xmid + round(sclX * x), ymid - round(sclY * y));
-    while x <= xHigh do
+    //canv.MoveTo(xmid + round(sclX * x), ymid - round(sclY * y));
+
+    mCalc.x := xLow;
+    while mCalc.x <= xHigh do
     begin
-        setX(x);
-        y := calc(exprTree);
-        canv.LineTo(xmid + round(sclX * x), ymid - round(sclY * y));
-        x := x + step;
+        y := mCalc.calculate(errorMessage);
+        //canv.LineTo(xmid + round(sclX * mCalc.x), ymid - round(sclY * y));
+        if length(ErrorMessage) = 0 then
+        begin
+            canv.Ellipse(xmid + round(sclX * mCalc.x) - 1, ymid - round(sclY * y) - 1,
+            xmid + round(sclX * mCalc.x) + 1, ymid - round(sclY * y) + 1);
+        end;
+
+        mCalc.x := mCalc.x + step;
     end;
 end;
 
@@ -97,8 +125,9 @@ var
     sExpr:String;
     exprTree:TExpression; //head contain result of calculating the expression
     isParsed:boolean;
-    ans:String;
+    ans, errorMessage:String;
     PosOfError:Integer;
+    mCalculator: TCalculator;
 begin
     sExpr := Self.editEnterExpression.Text;
     exprTree := nil;
@@ -108,8 +137,14 @@ begin
 
         if isParsed then
         begin
-            ans := FloatToStrf(calculate(exprTree), ffGeneral, 15, 5);
+            mCalculator := TCalculator.Create;
+            mCalculator.exprTree := exprTree;
+
+            ans := FloatToStrf(mCalculator.calculate(errorMessage), ffGeneral, 15, 5);
+            if(Length(errorMessage) <> 0) then
+                ans := errorMessage;
             lblAnswer.Caption := ans;
+            mCalculator.Free;
         end
         else
             lblAnswer.Caption := 'Incorrect expression '#13#10'Error in position:' + IntToStr(posOfError) + #13#10 +
@@ -119,6 +154,23 @@ begin
     exprTree.free;
 end;
 
+procedure TfrmMain.btnChooseFileClick(Sender: TObject);
+begin
+    if OpenTextFileDialog.Execute then
+    begin
+        if fileIsOpened then
+        begin
+            CloseFile(ExprFile);
+            fileIsOpened := false;
+        end;
+        AssignFile(ExprFile,OpenTextFileDialog.FileName);
+        Reset(ExprFile);
+        FileIsOpened := true;
+        exprIsRead := false;
+        lblState.Caption := 'File is opened';
+    end;
+end;
+
 procedure TfrmMain.btnDrawClick(Sender: TObject);   //check this shit
 var
     sExpr:String;
@@ -126,6 +178,7 @@ var
     isParsed:boolean;
     ans:String;
     PosOfError:Integer;
+    mCalculator: TCalculator;
 begin
     sExpr := Self.editEnterFunc.Text;
     exprTree := nil;
@@ -135,8 +188,13 @@ begin
 
         if isParsed then
         begin
+            mCalculator := TCalculator.Create;
+            mCalculator.exprTree := exprTree;
+
             lblGraphAns.Caption := '';
-            DrawGraph(calculate, exprTree, -10, 10, imgGraph.Canvas);
+
+            DrawGraph(mCalculator, -10, 10, imgGraph.Canvas);
+            mCalculator.Free;
         end
         else
             lblGraphAns.Caption := 'Incorrect expression '#13#10'Error in position:' + IntToStr(posOfError) + #13#10 +
@@ -144,6 +202,63 @@ begin
     end else
         lblGraphAns.Caption := 'empty string';
     exprTree.free;
+end;
+
+
+procedure TfrmMain.btnNextExprClick(Sender: TObject);
+var
+    temp: String;
+begin
+    if not EoF(ExprFile) then
+    begin
+        while EoLn(ExprFile) do
+            Readln(ExprFile, temp);
+
+        exprIsRead := true;
+        Readln(ExprFile, temp);
+        lblState.Caption := temp;
+    end else
+        ShowMessage('end of file');
+end;
+
+procedure TfrmMain.btnToCalcClick(Sender: TObject);
+begin
+    PageCtrlMain.ActivePage := tabCalc;
+    if ExprIsRead then
+    begin
+        editEnterExpression.Text := lblState.Caption;
+        frmMain.btnCalculateClick(btnCalculate);
+    end;
+end;
+
+procedure TfrmMain.btnToGraphClick(Sender: TObject);
+begin
+    PageCtrlMain.ActivePage := tabGraph;
+    if ExprIsRead then
+    begin
+        editEnterFunc.Text := lblState.Caption;
+        frmMain.btnDrawClick(btnDraw);
+    end;
+end;
+
+procedure TfrmMain.CloseEvent(Sender: TObject; var Action: TCloseAction);
+begin
+
+    if fileIsOpened then
+        CloseFile(ExprFile);
+
+    Action := caFree;
+end;
+
+procedure TfrmMain.mainCloseQuery(Sender: TObject; var CanClose: Boolean);
+begin
+    CanClose := MessageDlg ('Хотите выйти?',mtConfirmation,[mbYes,mbNo],0) = mrYes
+end;
+
+procedure TfrmMain.mainCreate(Sender: TObject);
+begin
+    fileIsOpened := false;
+    exprIsRead := false;
 end;
 
 end.
