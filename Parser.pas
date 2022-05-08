@@ -19,7 +19,7 @@ function ParseExpression(sExpr:string; varSupport:boolean; out isParsed:boolean;
 implementation
 
 uses
-  System.SysUtils;
+  System.SysUtils, System.Math;
 
 function ParseExpression(sExpr:string; varSupport:boolean; out isParsed:boolean; out posOfError:Integer):TExpression; //in future add posOfError:Integer as attribute
 var
@@ -350,6 +350,7 @@ end;
 function ParseFunction():TExpression;
 var
     size, cod, tempPos:Integer;
+    tempValue: Real;
     name: String;
     tempLexem: TLexem;
     tempExpr: TExpression;
@@ -384,18 +385,38 @@ begin
             tempLexem := lCtg
         else if name = 'sqrt' then
             tempLexem := lSqrt
-        else
+        else if name = 'e' then
+        begin
+            tempLexem := lNum;
+            tempValue := Exp(1.0);
+        end
+        else if name = 'pi' then
+        begin
+            tempLexem := lNum;
+            tempValue := pi;
+        end else
             isParsed := false;
 
         if isParsed then
         begin
-            result := parseGroup;
-            if result <> nil then
+            if tempLexem <> lNum then
             begin
-                tempExpr := TExpression.Create;
-                tempExpr.curLexem := tempLexem;
-                tempExpr.pLeft := result;
-                result := tempExpr;
+                result := parseGroup;
+                if result <> nil then
+                begin
+                    tempExpr := TExpression.Create;
+                    tempExpr.curLexem := tempLexem;
+                    tempExpr.pLeft := result;
+                    result := tempExpr;
+                end;
+            end else
+            begin
+                result := TExpression.Create;
+                with result do
+                begin
+                    curLexem := tempLexem;
+                    value := tempValue;
+                end;
             end;
         end else
             Pos := tempPos;

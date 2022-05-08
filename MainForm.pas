@@ -56,11 +56,13 @@ implementation
 
 procedure DrawGraph (mCalc:TCalculator; xLow: real; xHigh: real; canv: TCanvas);
 var
-    x, y, step: real;
+    y, step: real;
+    xprev, yprev: real;
     max, min: real;
     sclX, sclY: real;
     xmid, ymid: integer;
     ErrorMessage: String;
+    isCalculate: boolean;
 
 begin
     sclX := (canv.ClipRect.Right) / (xHigh - xLow);
@@ -104,16 +106,33 @@ begin
     canv.Pen.Color := clWhite;
     //canv.MoveTo(xmid + round(sclX * x), ymid - round(sclY * y));
 
-    mCalc.x := xLow;
+    xPrev := xLow;
+    mCalc.x := xPrev;
+    yPrev := mCalc.calculate(errorMessage);
+    isCalculate := length(ErrorMessage) = 0;
+
+    mCalc.x := xLow + step;
     while mCalc.x <= xHigh do
     begin
         y := mCalc.calculate(errorMessage);
         //canv.LineTo(xmid + round(sclX * mCalc.x), ymid - round(sclY * y));
-        if length(ErrorMessage) = 0 then
+        if length(ErrorMessage) = 0  then
         begin
-            canv.Ellipse(xmid + round(sclX * mCalc.x) - 1, ymid - round(sclY * y) - 1,
-            xmid + round(sclX * mCalc.x) + 1, ymid - round(sclY * y) + 1);
-        end;
+            if isCalculate then
+            begin
+                //draw
+                //canv.Ellipse(xmid + round(sclX * mCalc.x) - 1, ymid - round(sclY * y) - 1,
+                //xmid + round(sclX * mCalc.x) + 1, ymid - round(sclY * y) + 1);
+                canv.MoveTo(xmid + round(sclX * xPrev), ymid - round(sclY * yPrev));
+                canv.LineTo(xmid + round(sclX * mCalc.x), ymid - round(sclY * y));
+            end;
+            isCalculate := true;
+        end else
+            isCalculate := false;
+
+
+        yPrev := y;
+        xPrev := mCalc.x;
 
         mCalc.x := mCalc.x + step;
     end;

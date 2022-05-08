@@ -42,8 +42,9 @@ object frmMain: TfrmMain
       object lblState: TLabel
         Left = 72
         Top = 56
-        Width = 609
-        Height = 33
+        Width = 135
+        Height = 24
+        Align = alCustom
         Alignment = taCenter
         Caption = 'no file selected'
         Font.Charset = DEFAULT_CHARSET
