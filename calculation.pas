@@ -8,9 +8,9 @@ type
     TCalculator = class
     public
         exprTree:TExpression;
-        x:Real;//абсцисса
+        x:extended;//абсцисса
 
-        function calculate(out ErrorMessage: String):Real;
+        function calculate(out ErrorMessage: String):extended;
         destructor Destroy;
     end;
 
@@ -24,10 +24,10 @@ implementation
 
 { TCaclulator }
 
-function TCalculator.calculate(out ErrorMessage: String): Real;
-function calculate(var treeNode:TExpression):Real;//add checking of calculation
+function TCalculator.calculate(out ErrorMessage: String): extended;
+function calculate(var treeNode:TExpression):extended;//add checking of calculation
 var                                               //and issue(raise/monitor) errors
-    left, right:Real;
+    left, right:extended;
 Begin
     with treeNode do
     begin

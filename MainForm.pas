@@ -6,7 +6,7 @@ uses
   Winapi.Windows, Winapi.Messages, System.SysUtils, System.Variants, System.Classes, Vcl.Graphics,
   Vcl.Controls, Vcl.Forms, Vcl.Dialogs, Vcl.StdCtrls,
   Parser,
-  Calculation, Vcl.ComCtrls, Vcl.ExtCtrls, Vcl.ExtDlgs;
+  Calculation, Vcl.ComCtrls, Vcl.ExtCtrls, Vcl.ExtDlgs, PDJRotoLabel;
 
 type
   TfrmMain = class(TForm)
@@ -46,6 +46,16 @@ type
     lblUp5: TLabel;
     lblDown1: TLabel;
     lblUp1: TLabel;
+    lblRight1: TPDJRotoLabel;
+    lblRight2: TPDJRotoLabel;
+    lblRight3: TPDJRotoLabel;
+    lblRight4: TPDJRotoLabel;
+    lblRight5: TPDJRotoLabel;
+    lblLeft1: TPDJRotoLabel;
+    lblLeft2: TPDJRotoLabel;
+    lblLeft3: TPDJRotoLabel;
+    lblLeft4: TPDJRotoLabel;
+    lblLeft5: TPDJRotoLabel;
     procedure btnCalculateClick(Sender: TObject);
     procedure btnDrawClick(Sender: TObject);
     procedure btnChooseFileClick(Sender: TObject);
@@ -71,10 +81,10 @@ var
     frmMain: TfrmMain;
     ExprFile: Text;
     fileIsOpened, exprIsRead: boolean;
-    sclX, sclY: real;
+    sclX, sclY: extended;
     mGraphCalculator: TCalculator;
-    gScale, gStep: Real;
-    gMinX, gMaxX, gOffsetY: Real;
+    gScale, gStep: extended;
+    gMinX, gMaxX, gOffsetY: extended;
 
 implementation
 
@@ -347,7 +357,7 @@ end;
 
 procedure TfrmMain.btnIncScaleClick(Sender: TObject);
 var
-    temp: Real;
+    temp: extended;
 begin
     gScale := gScale * 1.1;
 
@@ -359,7 +369,7 @@ end;
 
 procedure TfrmMain.btnDecScaleClick(Sender: TObject);
 var
-    temp: Real;
+    temp: extended;
 begin
     gScale := gScale / 1.1;
 

@@ -36,8 +36,6 @@ object frmMain: TfrmMain
     ParentFont = False
     TabOrder = 0
     TabWidth = 200
-    ExplicitWidth = 784
-    ExplicitHeight = 649
     object TabFileEnter: TTabSheet
       Caption = 'File Input'
       ImageIndex = 2
@@ -283,6 +281,126 @@ object frmMain: TfrmMain
         Top = 149
         Width = 4
         Height = 16
+      end
+      object lblRight1: TPDJRotoLabel
+        Left = 751
+        Top = 141
+        Width = 26
+        Height = 85
+        Angle = ag90
+        Font.Charset = DEFAULT_CHARSET
+        Font.Color = clBlack
+        Font.Height = -13
+        Font.Name = 'Tahoma'
+        Font.Style = []
+      end
+      object lblRight2: TPDJRotoLabel
+        Left = 751
+        Top = 240
+        Width = 26
+        Height = 106
+        Angle = ag90
+        Font.Charset = DEFAULT_CHARSET
+        Font.Color = clBlack
+        Font.Height = -13
+        Font.Name = 'Tahoma'
+        Font.Style = []
+      end
+      object lblRight3: TPDJRotoLabel
+        Left = 751
+        Top = 352
+        Width = 26
+        Height = 106
+        Angle = ag90
+        Font.Charset = DEFAULT_CHARSET
+        Font.Color = clBlack
+        Font.Height = -13
+        Font.Name = 'Tahoma'
+        Font.Style = []
+      end
+      object lblRight4: TPDJRotoLabel
+        Left = 751
+        Top = 464
+        Width = 26
+        Height = 106
+        Angle = ag90
+        Font.Charset = DEFAULT_CHARSET
+        Font.Color = clBlack
+        Font.Height = -13
+        Font.Name = 'Tahoma'
+        Font.Style = []
+      end
+      object lblRight5: TPDJRotoLabel
+        Left = 751
+        Top = 584
+        Width = 26
+        Height = 82
+        Angle = ag90
+        Font.Charset = DEFAULT_CHARSET
+        Font.Color = clBlack
+        Font.Height = -13
+        Font.Name = 'Tahoma'
+        Font.Style = []
+      end
+      object lblLeft1: TPDJRotoLabel
+        Left = 13
+        Top = 141
+        Width = 26
+        Height = 85
+        Angle = ag90
+        Font.Charset = DEFAULT_CHARSET
+        Font.Color = clBlack
+        Font.Height = -13
+        Font.Name = 'Tahoma'
+        Font.Style = []
+      end
+      object lblLeft2: TPDJRotoLabel
+        Left = 13
+        Top = 240
+        Width = 26
+        Height = 106
+        Angle = ag90
+        Font.Charset = DEFAULT_CHARSET
+        Font.Color = clBlack
+        Font.Height = -13
+        Font.Name = 'Tahoma'
+        Font.Style = []
+      end
+      object lblLeft3: TPDJRotoLabel
+        Left = 13
+        Top = 352
+        Width = 26
+        Height = 106
+        Angle = ag90
+        Font.Charset = DEFAULT_CHARSET
+        Font.Color = clBlack
+        Font.Height = -13
+        Font.Name = 'Tahoma'
+        Font.Style = []
+      end
+      object lblLeft4: TPDJRotoLabel
+        Left = 13
+        Top = 464
+        Width = 26
+        Height = 106
+        Angle = ag90
+        Font.Charset = DEFAULT_CHARSET
+        Font.Color = clBlack
+        Font.Height = -13
+        Font.Name = 'Tahoma'
+        Font.Style = []
+      end
+      object lblLeft5: TPDJRotoLabel
+        Left = 13
+        Top = 584
+        Width = 26
+        Height = 82
+        Angle = ag90
+        Font.Charset = DEFAULT_CHARSET
+        Font.Color = clBlack
+        Font.Height = -13
+        Font.Name = 'Tahoma'
+        Font.Style = []
       end
       object btnDraw: TButton
         Left = 640
