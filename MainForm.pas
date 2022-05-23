@@ -82,10 +82,10 @@ var
     frmMain: TfrmMain;
     ExprFile: Text;
     fileIsOpened, exprIsRead: boolean;
-    sclX, sclY: extended;
+    sclX, sclY: real;
     mGraphCalculator: TCalculator;
-    gScale, gStep: extended;
-    gMinX, gMaxX, gOffsetY: extended;
+    gScale, gStep: real;
+    gMinX, gMaxX, gOffsetY: real;
 
 implementation
 
@@ -93,16 +93,16 @@ implementation
 
 procedure DrawGraph (var mCalc:TCalculator; canv: TCanvas);
 var
-    xLow, xHigh: extended;
-    y, step: extended;
-    xprev, yprev: extended;
-    //max, min: extended;
-    xmid, ymid: extended;
+    xLow, xHigh: real;
+    y, step: real;
+    xprev, yprev: real;
+    //max, min: real;
+    xmid, ymid: real;
     ErrorMessage: String;
     isCalculate: boolean;
     tempStr: String;
     tempInt, tempX, tempY: Integer;
-    tempReal: Extended;
+    tempReal: real;
 begin
         xLow := gMinX;
         xHigh := gMaxX;
@@ -428,7 +428,7 @@ end;
 
 procedure TfrmMain.btnIncScaleClick(Sender: TObject);
 var
-    temp: extended;
+    temp: real;
 begin
     if gScale < 100 then
     begin
@@ -445,7 +445,7 @@ end;
 
 procedure TfrmMain.btnDecScaleClick(Sender: TObject);
 var
-    temp: extended;
+    temp: real;
 begin
     if gScale > 1e-4 then
     begin

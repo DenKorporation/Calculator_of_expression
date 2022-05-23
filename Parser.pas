@@ -6,7 +6,7 @@ type
     lUPlus, lUMinus, lLg, lLn, lSin, lCos, lTan, lCtg, lSqrt); //left/right bracket   unary plus/minus
     TExpression = class
     public
-        value: extended;
+        value: real;
         curLexem: TLexem;
         pLeft: TExpression;
         pRight: TExpression;
@@ -35,7 +35,7 @@ end;
 
 
 
-function ParseNumber():extended; //change this fuck shit //через StrTofloat, или что-то типо
+function ParseNumber():real; //change this fuck shit //через StrTofloat, или что-то типо
 var
     size, cod:Integer;
 begin
@@ -356,7 +356,7 @@ end;
 function ParseFunction():TExpression;
 var
     size, cod, tempPos:Integer;
-    tempValue: extended;
+    tempValue: real;
     name: String;
     tempLexem: TLexem;
     tempExpr: TExpression;
