@@ -317,7 +317,7 @@ begin
             Pos := tempPos;
             SkipWhiteSpaces;
             isParsed := false;
-            Result.Destroy;
+            Result.free;
             Result := nil;
         end else
         begin
@@ -330,7 +330,7 @@ begin
                     Pos := tempPos;
                     SkipWhiteSpaces;
                     isParsed := false;
-                    Result.Destroy;
+                    Result.free;
                     Result := nil;
                 end;
             end;

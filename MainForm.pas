@@ -10,18 +10,15 @@ uses
 
 type
   TfrmMain = class(TForm)
-    editEnterExpression: TEdit;
     btnCalculate: TButton;
     lblHeadCalc: TLabel;
     lblAnswer: TLabel;
     PageCtrlMain: TPageControl;
     tabCalc: TTabSheet;
     tabGraph: TTabSheet;
-    editEnterFunc: TEdit;
     btnDraw: TButton;
     lblY: TLabel;
     lblHeadGraph: TLabel;
-    imgGraph: TImage;
     lblGraphAns: TLabel;
     TabFileEnter: TTabSheet;
     btnChooseFile: TButton;
@@ -30,6 +27,25 @@ type
     lblState: TLabel;
     btnToGraph: TButton;
     OpenTextFileDialog: TOpenTextFileDialog;
+    btnGraphUp: TButton;
+    btnGraphDown: TButton;
+    btnGraphLeft: TButton;
+    btnGraphRight: TButton;
+    btnIncScale: TButton;
+    btnDecScale: TButton;
+    imgGraph: TPaintBox;
+    editEnterExpression: TEdit;
+    editEnterFunc: TEdit;
+    lblDown3: TLabel;
+    lblDown4: TLabel;
+    lblDown2: TLabel;
+    lblUp2: TLabel;
+    lblUp3: TLabel;
+    lblUp4: TLabel;
+    lblDown5: TLabel;
+    lblUp5: TLabel;
+    lblDown1: TLabel;
+    lblUp1: TLabel;
     procedure btnCalculateClick(Sender: TObject);
     procedure btnDrawClick(Sender: TObject);
     procedure btnChooseFileClick(Sender: TObject);
@@ -39,6 +55,12 @@ type
     procedure btnNextExprClick(Sender: TObject);
     procedure btnToCalcClick(Sender: TObject);
     procedure btnToGraphClick(Sender: TObject);
+    procedure btnGraphLeftClick(Sender: TObject);
+    procedure btnGraphRightClick(Sender: TObject);
+    procedure btnGraphUpClick(Sender: TObject);
+    procedure btnGraphDownClick(Sender: TObject);
+    procedure btnDecScaleClick(Sender: TObject);
+    procedure btnIncScaleClick(Sender: TObject);
   private
     { Private declarations }
   public
@@ -46,65 +68,94 @@ type
   end;
 
 var
-  frmMain: TfrmMain;
-  ExprFile: Text;
-  fileIsOpened, exprIsRead: boolean;
+    frmMain: TfrmMain;
+    ExprFile: Text;
+    fileIsOpened, exprIsRead: boolean;
+    sclX, sclY: real;
+    mGraphCalculator: TCalculator;
+    gScale, gStep: Real;
+    gMinX, gMaxX, gOffsetY: Real;
 
 implementation
 
 {$R *.dfm}
 
-procedure DrawGraph (mCalc:TCalculator; xLow: real; xHigh: real; canv: TCanvas);
+procedure DrawGraph (var mCalc:TCalculator; canv: TCanvas);
 var
+    xLow, xHigh: Real;
     y, step: real;
     xprev, yprev: real;
     max, min: real;
-    sclX, sclY: real;
-    xmid, ymid: integer;
+    xmid, ymid: real;
     ErrorMessage: String;
     isCalculate: boolean;
-
+    tempStr: String;
 begin
-    sclX := (canv.ClipRect.Right) / (xHigh - xLow);
-    step := 1 / sclX;
-    xMid := canv.ClipRect.Right div 2;
-    yMid := canv.ClipRect.Bottom div 2;
-
-    mCalc.x := xLow;
-
-    max := 0;
-    min := max;
-
-    while mCalc.x <= xHigh do
-    begin
-        y := mCalc.calculate(ErrorMessage);
-        if length(ErrorMessage) = 0 then
-        begin
-            if y < min then
-                min := y;
-            if y > max then
-                max := y;
-        end;
-        mCalc.x := mCalc.x + step;
-    end;
-
+        xLow := gMinX;
+        xHigh := gMaxX;
+    sclX := (canv.ClipRect.Right) / (xHigh - xLow);//1 is sclX pixels
     sclY := sclX;
-//    if max = min then
-//        sclY := sclX
-//    else
-//        sclY := canv.ClipRect.Bottom / (max - min);
+    step := 1 / sclX;
+
+    xMid := canv.ClipRect.Right / 2;
+    yMid := canv.ClipRect.Bottom / 2;
 
     canv.Brush.Color := clBlack;
     canv.FillRect(Rect(0, 0, canv.ClipRect.Right, canv.ClipRect.Bottom));
-    canv.Pen.Color := clYellow;
-    canv.MoveTo(0, ymid);
-    canv.LineTo(canv.ClipRect.Right, ymid);
-    canv.MoveTo(xmid, 0);
-    canv.LineTo(xmid, canv.ClipRect.Bottom);
+    canv.Pen.Color := clGray;
 
+    canv.MoveTo(0, Round(ymid));
+    canv.LineTo(canv.ClipRect.Right, Round(ymid));
 
+    canv.MoveTo(0, Round(ymid / 2));
+    canv.LineTo(canv.ClipRect.Right, Round(ymid / 2));
+
+    canv.MoveTo(0, Round(3 * ymid / 2));
+    canv.LineTo(canv.ClipRect.Right, Round(3 * ymid / 2));
+
+    canv.MoveTo(Round(xmid), 0);
+    canv.LineTo(Round(xmid), canv.ClipRect.Bottom);
+
+    canv.MoveTo(round(xmid / 2), 0);
+    canv.LineTo(Round(xmid / 2), canv.ClipRect.Bottom);
+
+    canv.MoveTo(round(3 * xmid / 2), 0);
+    canv.LineTo(Round(3 * xmid / 2), canv.ClipRect.Bottom);
+
+    with frmMain do
+    begin
+        tempStr := FloatToStrf(xLow, ffGeneral, 10, 5);
+        lblUp1.Caption := tempStr;
+        lblDown1.Caption := tempStr;
+
+        tempStr := FloatToStrf(xLow + (xmid / 2 * step), ffGeneral, 10, 5);
+        lblUp2.Caption := tempStr;
+        lblDown2.Caption := tempStr;
+
+        tempStr := FloatToStrf(xLow + (xmid * step), ffGeneral, 10, 5);
+        lblUp3.Caption := tempStr;
+        lblDown3.Caption := tempStr;
+
+        tempStr := FloatToStrf(xLow + (3 * xmid / 2 * step), ffGeneral, 10, 5);
+        lblUp4.Caption := tempStr;
+        lblDown4.Caption := tempStr;
+
+        tempStr := FloatToStrf(xHigh, ffGeneral, 10, 5);
+        lblUp5.Caption := tempStr;
+        lblDown5.Caption := tempStr;
+    end;
+
+    //Axises
     canv.Pen.Color := clWhite;
-    //canv.MoveTo(xmid + round(sclX * x), ymid - round(sclY * y));
+
+    canv.MoveTo(0, Round(yMid + gOffSetY * SclY));
+    canv.LineTo(canv.ClipRect.right, Round(yMid + gOffSetY * SclY));
+
+    canv.MoveTo(Round(-xLow * sclX), 0);
+    canv.LineTo(Round(-xLow * sclX), canv.clipRect.Bottom);
+
+
+    canv.Pen.Color := clYellow;
 
     xPrev := xLow;
     mCalc.x := xPrev;
@@ -115,27 +166,49 @@ begin
     while mCalc.x <= xHigh do
     begin
         y := mCalc.calculate(errorMessage);
-        //canv.LineTo(xmid + round(sclX * mCalc.x), ymid - round(sclY * y));
         if length(ErrorMessage) = 0  then
         begin
             if isCalculate then
             begin
                 //draw
-                //canv.Ellipse(xmid + round(sclX * mCalc.x) - 1, ymid - round(sclY * y) - 1,
-                //xmid + round(sclX * mCalc.x) + 1, ymid - round(sclY * y) + 1);
-                canv.MoveTo(xmid + round(sclX * xPrev), ymid - round(sclY * yPrev));
-                canv.LineTo(xmid + round(sclX * mCalc.x), ymid - round(sclY * y));
+                canv.moveTo(Round((xPrev - xLow) * SclX), Round(ymid -(yPrev - gOffSetY) * SclY));
+                canv.LineTo(Round((mCalc.x - xLow) * SclX), Round(ymid -(y - gOffSetY) * SclY));
             end;
             isCalculate := true;
         end else
             isCalculate := false;
-
 
         yPrev := y;
         xPrev := mCalc.x;
 
         mCalc.x := mCalc.x + step;
     end;
+
+
+//    mCalc.x := gMinX;
+//
+//    max := 0;
+//    min := max;
+//
+//    while mCalc.x <= gMaxX do
+//    begin
+//        y := mCalc.calculate(ErrorMessage);
+//        if length(ErrorMessage) = 0 then
+//        begin
+//            if y < min then
+//                min := y;
+//            if y > max then
+//                max := y;
+//        end;
+//        mCalc.x := mCalc.x + step;
+//    end;
+//
+//    sclY := sclX;
+////    if max = min then
+////        sclY := sclX
+////    else
+////        sclY := canv.ClipRect.Bottom / (max - min);
+//
 end;
 
 
@@ -197,7 +270,6 @@ var
     isParsed:boolean;
     ans:String;
     PosOfError:Integer;
-    mCalculator: TCalculator;
 begin
     sExpr := Self.editEnterFunc.Text;
     exprTree := nil;
@@ -207,22 +279,95 @@ begin
 
         if isParsed then
         begin
-            mCalculator := TCalculator.Create;
-            mCalculator.exprTree := exprTree;
+            gScale := 1.0;
+            gMinX := -10;
+            gMaxX := 10;
+            gStep := 2;
+            gOffsetY := 0;
+            mGraphCalculator.Free;
+            mGraphCalculator := TCalculator.Create;
+            mGraphCalculator.exprTree := exprTree;
 
             lblGraphAns.Caption := '';
 
-            DrawGraph(mCalculator, -10, 10, imgGraph.Canvas);
-            mCalculator.Free;
-        end
-        else
+            DrawGraph(mGraphCalculator, imgGraph.Canvas);
+
+            btnGraphUp.Enabled := true;
+            btnGraphUp.Visible := true;
+
+            btnGraphDown.Enabled := true;
+            btnGraphDown.Visible := true;
+
+            btnGraphLeft.Enabled := true;
+            btnGraphLeft.Visible := true;
+
+            btnGraphRight.Enabled := true;
+            btnGraphRight.Visible := true;
+
+            btnIncScale.Enabled := true;
+            btnIncScale.Visible := true;
+
+            btnDecScale.Enabled := true;
+            btnDecScale.Visible := true;
+        end else
             lblGraphAns.Caption := 'Incorrect expression '#13#10'Error in position:' + IntToStr(posOfError) + #13#10 +
                                 'character: ' + sExpr[PosOfError];
     end else
         lblGraphAns.Caption := 'empty string';
-    exprTree.free;
+    //exprTree.free;
 end;
 
+
+procedure TfrmMain.btnGraphLeftClick(Sender: TObject);
+begin
+    gMinX := gMinX - gStep * gScale;
+    gMaxX := gMaxX - gStep * gScale;
+    DrawGraph(mGraphCalculator, imgGraph.Canvas);
+end;
+
+procedure TfrmMain.btnGraphRightClick(Sender: TObject);
+begin
+    gMinX := gMinX + gStep * gScale;
+    gMaxX := gMaxX + gStep * gScale;
+    DrawGraph(mGraphCalculator, imgGraph.Canvas);
+end;
+
+procedure TfrmMain.btnGraphDownClick(Sender: TObject);
+begin
+    gOffsetY := gOffSetY - gStep * gScale;
+    DrawGraph(mGraphCalculator, imgGraph.Canvas);
+end;
+
+
+procedure TfrmMain.btnGraphUpClick(Sender: TObject);
+begin
+    gOffsetY := gOffSetY + gStep * gScale;
+    DrawGraph(mGraphCalculator, imgGraph.Canvas);
+end;
+
+procedure TfrmMain.btnIncScaleClick(Sender: TObject);
+var
+    temp: Real;
+begin
+    gScale := gScale * 1.1;
+
+    temp := (gMaxX - gMinX) * 0.1 / 2;
+    gMaxX := gMaxX - temp;
+    gMinX := gMinX + temp;
+    DrawGraph(mGraphCalculator, imgGraph.Canvas);
+end;
+
+procedure TfrmMain.btnDecScaleClick(Sender: TObject);
+var
+    temp: Real;
+begin
+    gScale := gScale / 1.1;
+
+    temp := (gMaxX - gMinX) * 0.1 / 2;
+    gMaxX := gMaxX + temp;
+    gMinX := gMinX - temp;
+    DrawGraph(mGraphCalculator, imgGraph.Canvas);
+end;
 
 procedure TfrmMain.btnNextExprClick(Sender: TObject);
 var
@@ -266,8 +411,11 @@ begin
     if fileIsOpened then
         CloseFile(ExprFile);
 
+    mGraphCalculator.Free;
+
     Action := caFree;
 end;
+
 
 procedure TfrmMain.mainCloseQuery(Sender: TObject; var CanClose: Boolean);
 begin
@@ -278,6 +426,14 @@ procedure TfrmMain.mainCreate(Sender: TObject);
 begin
     fileIsOpened := false;
     exprIsRead := false;
+    gScale := 1.0;
+    gMinX := -10;
+    gMaxX := 10;
+    gStep := 2;
+    gOffsetY := 0;
+
+    editEnterExpression.Text := 'Enter your expresion';
+    editEnterFunc.Text := 'Enter your function';
 end;
 
 end.

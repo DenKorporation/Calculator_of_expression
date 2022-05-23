@@ -11,6 +11,7 @@ type
         x:Real;//абсцисса
 
         function calculate(out ErrorMessage: String):Real;
+        destructor Destroy;
     end;
 
     ECalcError = class(Exception);
@@ -120,6 +121,11 @@ begin
         else
             raise;
     end;
+end;
+
+destructor TCalculator.Destroy;
+begin
+    exprTree.Free;
 end;
 
 end.
