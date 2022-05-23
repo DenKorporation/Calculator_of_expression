@@ -102,7 +102,7 @@ Begin
                     if left >= 0 then
                         value := Sqrt(left)
                     else
-                        raise ECalcError.Create('sqrt of a negativ number');
+                        raise ECalcError.Create('sqrt of a negative number');
                 end;
             end;
         end else if curLexem = lVar then

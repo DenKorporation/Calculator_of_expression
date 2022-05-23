@@ -99,11 +99,14 @@ var
     tempPos:Integer;
     tempLexem:TLexem;
     tempExpr:TExpression;
+    minusPos: Integer;
 begin
     tempPos := Pos;
+    minusPos := Pos;
     tempLexem := parseOperator;
     if not (tempLexem in [lAdd, lSub]) then
         Pos := tempPos;
+
 
     result := parseFunction;
     if (result = nil) then
@@ -131,6 +134,9 @@ begin
             end;
             if not isParsed then
             begin
+                if tempLexem in [lAdd, lSub] then
+                    Pos := minusPos;
+
                 Result.Destroy;
                 Result := nil;
             end;

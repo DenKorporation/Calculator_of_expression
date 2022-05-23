@@ -36,16 +36,6 @@ type
     imgGraph: TPaintBox;
     editEnterExpression: TEdit;
     editEnterFunc: TEdit;
-    lblDown3: TLabel;
-    lblDown4: TLabel;
-    lblDown2: TLabel;
-    lblUp2: TLabel;
-    lblUp3: TLabel;
-    lblUp4: TLabel;
-    lblDown5: TLabel;
-    lblUp5: TLabel;
-    lblDown1: TLabel;
-    lblUp1: TLabel;
     lblRight1: TPDJRotoLabel;
     lblRight2: TPDJRotoLabel;
     lblRight3: TPDJRotoLabel;
@@ -56,6 +46,16 @@ type
     lblLeft3: TPDJRotoLabel;
     lblLeft4: TPDJRotoLabel;
     lblLeft5: TPDJRotoLabel;
+    lblUp1: TPDJRotoLabel;
+    lblUp2: TPDJRotoLabel;
+    lblUp3: TPDJRotoLabel;
+    lblUp5: TPDJRotoLabel;
+    lblUp4: TPDJRotoLabel;
+    lblDown1: TPDJRotoLabel;
+    lblDown2: TPDJRotoLabel;
+    lblDown3: TPDJRotoLabel;
+    lblDown4: TPDJRotoLabel;
+    lblDown5: TPDJRotoLabel;
     procedure btnCalculateClick(Sender: TObject);
     procedure btnDrawClick(Sender: TObject);
     procedure btnChooseFileClick(Sender: TObject);
@@ -71,6 +71,7 @@ type
     procedure btnGraphDownClick(Sender: TObject);
     procedure btnDecScaleClick(Sender: TObject);
     procedure btnIncScaleClick(Sender: TObject);
+    procedure PageCtrlMainChange(Sender: TObject);
   private
     { Private declarations }
   public
@@ -92,14 +93,16 @@ implementation
 
 procedure DrawGraph (var mCalc:TCalculator; canv: TCanvas);
 var
-    xLow, xHigh: Real;
-    y, step: real;
-    xprev, yprev: real;
-    max, min: real;
-    xmid, ymid: real;
+    xLow, xHigh: extended;
+    y, step: extended;
+    xprev, yprev: extended;
+    //max, min: extended;
+    xmid, ymid: extended;
     ErrorMessage: String;
     isCalculate: boolean;
     tempStr: String;
+    tempInt, tempX, tempY: Integer;
+    tempReal: Extended;
 begin
         xLow := gMinX;
         xHigh := gMaxX;
@@ -134,35 +137,76 @@ begin
 
     with frmMain do
     begin
-        tempStr := FloatToStrf(xLow, ffGeneral, 10, 5);
+        tempStr := FloatToStrf(xLow, ffGeneral, 3, 5);
         lblUp1.Caption := tempStr;
         lblDown1.Caption := tempStr;
 
-        tempStr := FloatToStrf(xLow + (xmid / 2 * step), ffGeneral, 10, 5);
+        tempStr := FloatToStrf(xLow + (xmid / 2 * step), ffGeneral, 3, 7);
         lblUp2.Caption := tempStr;
         lblDown2.Caption := tempStr;
 
-        tempStr := FloatToStrf(xLow + (xmid * step), ffGeneral, 10, 5);
+        tempStr := FloatToStrf(xLow + (xmid * step), ffGeneral, 3, 7);
         lblUp3.Caption := tempStr;
         lblDown3.Caption := tempStr;
 
-        tempStr := FloatToStrf(xLow + (3 * xmid / 2 * step), ffGeneral, 10, 5);
+        tempStr := FloatToStrf(xLow + (3 * xmid / 2 * step), ffGeneral, 3, 7);
         lblUp4.Caption := tempStr;
         lblDown4.Caption := tempStr;
 
-        tempStr := FloatToStrf(xHigh, ffGeneral, 10, 5);
+        tempStr := FloatToStrf(xHigh, ffGeneral, 3, 7);
         lblUp5.Caption := tempStr;
         lblDown5.Caption := tempStr;
+
+        tempStr := FloatToStrf(ymid /sclY + gOffSetY, ffGeneral, 3, 7);
+        lblLeft1.Caption := tempStr;
+        lblRight1.Caption := tempStr;
+
+        tempStr := FloatToStrf(ymid / 2 /sclY + gOffSetY, ffGeneral, 3, 7);
+        lblLeft2.Caption := tempStr;
+        lblRight2.Caption := tempStr;
+
+        tempStr := FloatToStrf(gOffSetY, ffGeneral, 3, 7);
+        lblLeft3.Caption := tempStr;
+        lblRight3.Caption := tempStr;
+
+        tempStr := FloatToStrf(-ymid / 2 /sclY + gOffSetY, ffGeneral, 3, 7);
+        lblLeft4.Caption := tempStr;
+        lblRight4.Caption := tempStr;
+
+        tempStr := FloatToStrf(-ymid /sclY + gOffSetY, ffGeneral, 3, 7);
+        lblLeft5.Caption := tempStr;
+        lblRight5.Caption := tempStr;
+
     end;
 
     //Axises
     canv.Pen.Color := clWhite;
 
-    canv.MoveTo(0, Round(yMid + gOffSetY * SclY));
-    canv.LineTo(canv.ClipRect.right, Round(yMid + gOffSetY * SclY));
+    tempReal := yMid + gOffSetY * SclY;
+    if(abs(tempReal) > MaxInt) then
+    begin
+        if tempReal < 0 then
+            tempInt := -MaxInt
+        else
+            tempInt := MaxInt
+    end else
+        tempInt := Round(tempReal);
 
-    canv.MoveTo(Round(-xLow * sclX), 0);
-    canv.LineTo(Round(-xLow * sclX), canv.clipRect.Bottom);
+    canv.MoveTo(0, tempInt);
+    canv.LineTo(canv.ClipRect.right, tempInt);
+
+
+    tempReal := -xLow * sclX;
+    if(abs(tempReal) > MaxInt) then
+    begin
+        if tempReal < 0 then
+            tempInt := -MaxInt
+        else
+            tempInt := MaxInt
+    end else
+        tempInt := Round(tempReal);
+    canv.MoveTo(tempInt, 0);
+    canv.LineTo(tempInt, canv.clipRect.Bottom);
 
 
     canv.Pen.Color := clYellow;
@@ -181,44 +225,59 @@ begin
             if isCalculate then
             begin
                 //draw
-                canv.moveTo(Round((xPrev - xLow) * SclX), Round(ymid -(yPrev - gOffSetY) * SclY));
-                canv.LineTo(Round((mCalc.x - xLow) * SclX), Round(ymid -(y - gOffSetY) * SclY));
+                tempReal := (xPrev - xLow) * SclX;
+                if(abs(tempReal) > MaxInt) then
+                begin
+                    if tempReal < 0 then
+                        tempX := -MaxInt
+                    else
+                        tempX := MaxInt
+                end else
+                    tempX := Round(tempReal);
+
+                tempReal := ymid - (yPrev - gOffSetY) * SclY;
+                if(abs(tempReal) > MaxInt) then
+                begin
+                    if tempReal < 0 then
+                        tempY := -MaxInt
+                    else
+                        tempY := MaxInt
+                end else
+                    tempY := Round(tempReal);
+
+                canv.moveTo(tempX, tempY);
+
+
+                tempReal := (mCalc.x - xLow) * SclX;
+                if(abs(tempReal) > MaxInt) then
+                begin
+                    if tempReal < 0 then
+                        tempX := -MaxInt
+                    else
+                        tempX := MaxInt
+                end else
+                    tempX := Round(tempReal);
+
+                tempReal := ymid - (y - gOffSetY) * SclY;
+                if(abs(tempReal) > MaxInt) then
+                begin
+                    if tempReal < 0 then
+                        tempY := -MaxInt
+                    else
+                        tempY := MaxInt
+                end else
+                    tempY := Round(tempReal);
+
+                canv.LineTo(tempX, tempY);
             end;
             isCalculate := true;
         end else
             isCalculate := false;
-
         yPrev := y;
         xPrev := mCalc.x;
 
         mCalc.x := mCalc.x + step;
     end;
-
-
-//    mCalc.x := gMinX;
-//
-//    max := 0;
-//    min := max;
-//
-//    while mCalc.x <= gMaxX do
-//    begin
-//        y := mCalc.calculate(ErrorMessage);
-//        if length(ErrorMessage) = 0 then
-//        begin
-//            if y < min then
-//                min := y;
-//            if y > max then
-//                max := y;
-//        end;
-//        mCalc.x := mCalc.x + step;
-//    end;
-//
-//    sclY := sclX;
-////    if max = min then
-////        sclY := sclX
-////    else
-////        sclY := canv.ClipRect.Bottom / (max - min);
-//
 end;
 
 
@@ -330,53 +389,73 @@ end;
 
 procedure TfrmMain.btnGraphLeftClick(Sender: TObject);
 begin
-    gMinX := gMinX - gStep * gScale;
-    gMaxX := gMaxX - gStep * gScale;
-    DrawGraph(mGraphCalculator, imgGraph.Canvas);
+    if (gMinX - gStep / gScale) > -MaxInt / 2 then
+    begin
+        gMinX := gMinX - gStep / gScale;
+        gMaxX := gMaxX - gStep / gScale;
+        DrawGraph(mGraphCalculator, imgGraph.Canvas);
+    end;
 end;
 
 procedure TfrmMain.btnGraphRightClick(Sender: TObject);
 begin
-    gMinX := gMinX + gStep * gScale;
-    gMaxX := gMaxX + gStep * gScale;
-    DrawGraph(mGraphCalculator, imgGraph.Canvas);
+    if (gMinX + gStep / gScale) < MaxInt / 2 then
+    begin
+        gMinX := gMinX + gStep / gScale;
+        gMaxX := gMaxX + gStep / gScale;
+        DrawGraph(mGraphCalculator, imgGraph.Canvas);
+    end;
 end;
 
 procedure TfrmMain.btnGraphDownClick(Sender: TObject);
 begin
-    gOffsetY := gOffSetY - gStep * gScale;
-    DrawGraph(mGraphCalculator, imgGraph.Canvas);
+    if (gOffSetY - gStep / gScale) > (-MaxInt / 2) then
+    begin
+        gOffsetY := gOffSetY - gStep / gScale;
+        DrawGraph(mGraphCalculator, imgGraph.Canvas);
+    end;
 end;
 
 
 procedure TfrmMain.btnGraphUpClick(Sender: TObject);
 begin
-    gOffsetY := gOffSetY + gStep * gScale;
-    DrawGraph(mGraphCalculator, imgGraph.Canvas);
+    if (gOffSetY + gStep / gScale) > (-MaxInt / 2) then
+    begin
+        gOffsetY := gOffSetY + gStep / gScale;
+        DrawGraph(mGraphCalculator, imgGraph.Canvas);
+    end;
 end;
 
 procedure TfrmMain.btnIncScaleClick(Sender: TObject);
 var
     temp: extended;
 begin
-    gScale := gScale * 1.1;
+    if gScale < 100 then
+    begin
+        gScale := gScale * 1.1;
 
-    temp := (gMaxX - gMinX) * 0.1 / 2;
-    gMaxX := gMaxX - temp;
-    gMinX := gMinX + temp;
-    DrawGraph(mGraphCalculator, imgGraph.Canvas);
+        temp := (gMaxX - gMinX) * 0.1 / 2;
+        gMaxX := gMaxX - temp;
+        gMinX := gMinX + temp;
+        DrawGraph(mGraphCalculator, imgGraph.Canvas);
+
+    end;
+
 end;
 
 procedure TfrmMain.btnDecScaleClick(Sender: TObject);
 var
     temp: extended;
 begin
-    gScale := gScale / 1.1;
+    if gScale > 1e-4 then
+    begin
+        gScale := gScale / 1.1;
 
-    temp := (gMaxX - gMinX) * 0.1 / 2;
-    gMaxX := gMaxX + temp;
-    gMinX := gMinX - temp;
-    DrawGraph(mGraphCalculator, imgGraph.Canvas);
+        temp := (gMaxX - gMinX) * 0.1 / 2;
+        gMaxX := gMaxX + temp;
+        gMinX := gMinX - temp;
+        DrawGraph(mGraphCalculator, imgGraph.Canvas);
+    end;
 end;
 
 procedure TfrmMain.btnNextExprClick(Sender: TObject);
@@ -444,6 +523,12 @@ begin
 
     editEnterExpression.Text := 'Enter your expresion';
     editEnterFunc.Text := 'Enter your function';
+end;
+
+procedure TfrmMain.PageCtrlMainChange(Sender: TObject);
+begin
+    if(frmMain.PageCtrlMain.ActivePageIndex = 2) and frmMain.btnGraphUp.Visible then
+        DrawGraph(mGraphCalculator, imgGraph.Canvas);
 end;
 
 end.

@@ -36,6 +36,7 @@ object frmMain: TfrmMain
     ParentFont = False
     TabOrder = 0
     TabWidth = 200
+    OnChange = PageCtrlMainChange
     object TabFileEnter: TTabSheet
       Caption = 'File Input'
       ImageIndex = 2
@@ -181,12 +182,14 @@ object frmMain: TfrmMain
         Top = 37
         Width = 37
         Height = 24
+        BiDiMode = bdLeftToRight
         Caption = 'y = '
         Font.Charset = DEFAULT_CHARSET
         Font.Color = clWindowText
         Font.Height = -20
         Font.Name = 'Tahoma'
         Font.Style = []
+        ParentBiDiMode = False
         ParentFont = False
       end
       object lblHeadGraph: TLabel
@@ -220,73 +223,12 @@ object frmMain: TfrmMain
         Width = 700
         Height = 450
       end
-      object lblDown3: TLabel
-        Left = 368
-        Top = 636
-        Width = 4
-        Height = 16
-      end
-      object lblDown4: TLabel
-        Left = 573
-        Top = 636
-        Width = 4
-        Height = 16
-      end
-      object lblDown2: TLabel
-        Left = 208
-        Top = 636
-        Width = 4
-        Height = 16
-      end
-      object lblUp2: TLabel
-        Left = 208
-        Top = 149
-        Width = 4
-        Height = 16
-      end
-      object lblUp3: TLabel
-        Left = 368
-        Top = 149
-        Width = 4
-        Height = 16
-      end
-      object lblUp4: TLabel
-        Left = 573
-        Top = 149
-        Width = 4
-        Height = 16
-      end
-      object lblDown5: TLabel
-        Left = 728
-        Top = 636
-        Width = 4
-        Height = 16
-      end
-      object lblUp5: TLabel
-        Left = 728
-        Top = 149
-        Width = 4
-        Height = 16
-        BiDiMode = bdLeftToRight
-        ParentBiDiMode = False
-      end
-      object lblDown1: TLabel
-        Left = 40
-        Top = 636
-        Width = 4
-        Height = 16
-      end
-      object lblUp1: TLabel
-        Left = 40
-        Top = 149
-        Width = 4
-        Height = 16
-      end
       object lblRight1: TPDJRotoLabel
         Left = 751
-        Top = 141
+        Top = 148
         Width = 26
-        Height = 85
+        Height = 78
+        Transparent = True
         Angle = ag90
         Font.Charset = DEFAULT_CHARSET
         Font.Color = clBlack
@@ -299,6 +241,7 @@ object frmMain: TfrmMain
         Top = 240
         Width = 26
         Height = 106
+        Transparent = True
         Angle = ag90
         Font.Charset = DEFAULT_CHARSET
         Font.Color = clBlack
@@ -311,6 +254,7 @@ object frmMain: TfrmMain
         Top = 352
         Width = 26
         Height = 106
+        Transparent = True
         Angle = ag90
         Font.Charset = DEFAULT_CHARSET
         Font.Color = clBlack
@@ -323,6 +267,7 @@ object frmMain: TfrmMain
         Top = 464
         Width = 26
         Height = 106
+        Transparent = True
         Angle = ag90
         Font.Charset = DEFAULT_CHARSET
         Font.Color = clBlack
@@ -335,6 +280,7 @@ object frmMain: TfrmMain
         Top = 584
         Width = 26
         Height = 82
+        Transparent = True
         Angle = ag90
         Font.Charset = DEFAULT_CHARSET
         Font.Color = clBlack
@@ -344,9 +290,10 @@ object frmMain: TfrmMain
       end
       object lblLeft1: TPDJRotoLabel
         Left = 13
-        Top = 141
+        Top = 148
         Width = 26
-        Height = 85
+        Height = 78
+        Transparent = True
         Angle = ag90
         Font.Charset = DEFAULT_CHARSET
         Font.Color = clBlack
@@ -359,6 +306,7 @@ object frmMain: TfrmMain
         Top = 240
         Width = 26
         Height = 106
+        Transparent = True
         Angle = ag90
         Font.Charset = DEFAULT_CHARSET
         Font.Color = clBlack
@@ -371,6 +319,7 @@ object frmMain: TfrmMain
         Top = 352
         Width = 26
         Height = 106
+        Transparent = True
         Angle = ag90
         Font.Charset = DEFAULT_CHARSET
         Font.Color = clBlack
@@ -383,6 +332,7 @@ object frmMain: TfrmMain
         Top = 464
         Width = 26
         Height = 106
+        Transparent = True
         Angle = ag90
         Font.Charset = DEFAULT_CHARSET
         Font.Color = clBlack
@@ -395,11 +345,142 @@ object frmMain: TfrmMain
         Top = 584
         Width = 26
         Height = 82
+        Transparent = True
         Angle = ag90
         Font.Charset = DEFAULT_CHARSET
         Font.Color = clBlack
         Font.Height = -13
         Font.Name = 'Tahoma'
+        Font.Style = []
+      end
+      object lblUp1: TPDJRotoLabel
+        Left = 13
+        Top = 148
+        Width = 100
+        Height = 26
+        Transparent = True
+        Angle = ag0
+        Font.Charset = DEFAULT_CHARSET
+        Font.Color = clBlack
+        Font.Height = -13
+        Font.Name = 'Arial'
+        Font.Style = []
+      end
+      object lblUp2: TPDJRotoLabel
+        Left = 174
+        Top = 148
+        Width = 100
+        Height = 26
+        Transparent = True
+        Angle = ag0
+        Font.Charset = DEFAULT_CHARSET
+        Font.Color = clBlack
+        Font.Height = -13
+        Font.Name = 'Arial'
+        Font.Style = []
+      end
+      object lblUp3: TPDJRotoLabel
+        Left = 350
+        Top = 148
+        Width = 100
+        Height = 26
+        Transparent = True
+        Angle = ag0
+        Font.Charset = DEFAULT_CHARSET
+        Font.Color = clBlack
+        Font.Height = -13
+        Font.Name = 'Arial'
+        Font.Style = []
+      end
+      object lblUp5: TPDJRotoLabel
+        Left = 672
+        Top = 148
+        Width = 100
+        Height = 26
+        Transparent = True
+        Angle = ag0
+        Font.Charset = DEFAULT_CHARSET
+        Font.Color = clBlack
+        Font.Height = -13
+        Font.Name = 'Arial'
+        Font.Style = []
+      end
+      object lblUp4: TPDJRotoLabel
+        Left = 526
+        Top = 148
+        Width = 100
+        Height = 26
+        Transparent = True
+        Angle = ag0
+        Font.Charset = DEFAULT_CHARSET
+        Font.Color = clBlack
+        Font.Height = -13
+        Font.Name = 'Arial'
+        Font.Style = []
+      end
+      object lblDown1: TPDJRotoLabel
+        Left = 13
+        Top = 640
+        Width = 100
+        Height = 26
+        Transparent = True
+        Angle = ag0
+        Font.Charset = DEFAULT_CHARSET
+        Font.Color = clBlack
+        Font.Height = -13
+        Font.Name = 'Arial'
+        Font.Style = []
+      end
+      object lblDown2: TPDJRotoLabel
+        Left = 174
+        Top = 640
+        Width = 100
+        Height = 26
+        Transparent = True
+        Angle = ag0
+        Font.Charset = DEFAULT_CHARSET
+        Font.Color = clBlack
+        Font.Height = -13
+        Font.Name = 'Arial'
+        Font.Style = []
+      end
+      object lblDown3: TPDJRotoLabel
+        Left = 350
+        Top = 640
+        Width = 100
+        Height = 26
+        Transparent = True
+        Angle = ag0
+        Font.Charset = DEFAULT_CHARSET
+        Font.Color = clBlack
+        Font.Height = -13
+        Font.Name = 'Arial'
+        Font.Style = []
+      end
+      object lblDown4: TPDJRotoLabel
+        Left = 526
+        Top = 640
+        Width = 100
+        Height = 26
+        Transparent = True
+        Angle = ag0
+        Font.Charset = DEFAULT_CHARSET
+        Font.Color = clBlack
+        Font.Height = -13
+        Font.Name = 'Arial'
+        Font.Style = []
+      end
+      object lblDown5: TPDJRotoLabel
+        Left = 677
+        Top = 640
+        Width = 100
+        Height = 26
+        Transparent = True
+        Angle = ag0
+        Font.Charset = DEFAULT_CHARSET
+        Font.Color = clBlack
+        Font.Height = -13
+        Font.Name = 'Arial'
         Font.Style = []
       end
       object btnDraw: TButton
@@ -487,7 +568,7 @@ object frmMain: TfrmMain
       end
       object btnIncScale: TButton
         Left = 80
-        Top = 476
+        Top = 464
         Width = 50
         Height = 50
         Caption = '+'
@@ -504,7 +585,7 @@ object frmMain: TfrmMain
       end
       object btnDecScale: TButton
         Left = 80
-        Top = 548
+        Top = 540
         Width = 50
         Height = 50
         Caption = '-'
